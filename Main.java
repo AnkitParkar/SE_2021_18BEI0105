@@ -1,6 +1,7 @@
 package HitWicketChess;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -8,29 +9,80 @@ public class Main {
     static Object[][] fin=new Object[5][5];
     static List<String> firstName=new ArrayList<>();
     static List<String> secondName=new ArrayList<>();
+    static int firstCount=5, secondCount=5;
+    static Scanner sc=new Scanner(System.in);
+    static List<Character> pMoves= new ArrayList<>();
+    static HashMap<String, Integer> pos=new HashMap<>();
 
 
     public static void main(String[] args) {
-        for(int i=0;i<fin.length;i++){
-            for(int j=0;j<fin.length;j++)
-                fin[i][j]='-';
-        }
-
+        for(int i=0;i<fin.length;i++){ for(int j=0;j<fin.length;j++) fin[i][j]='-'; }
         disp();
         getNames();
-        System.out.println("Finished getting names");
         names();
         firstInsert();
         disp();
+        for(String i:pos.keySet()){
+            System.out.println("Key: "+i+" pos: "+pos.get(i));
+        }
+        boolean flag=true;
+        while( firstCount>0 && secondCount>0){
+            disp();
+            move(flag);
+            flag=!flag;
+        }
+    }
+
+    private static void move(boolean flag){
+        if (flag) {
+            if (firstMove()) return;
+            else firstMove();
+        }
+        else{
+            if (secondMove()) return;
+            else secondMove();
+        }
+    }
+
+    private static boolean firstMove(){
+        System.out.println("Player A's Move:");
+        StringBuffer inp=new StringBuffer(sc.nextLine());
+        String piece=(String) inp.substring(0,2);
+        char move=inp.charAt(3);
+        if (piece.charAt(0)=='P') {
+            if (!pMoves.contains(move)){
+                System.out.println("Move does not exist");
+                return false;
+            }
+        }
+        if(!pos.keySet().contains("A-"+piece)){
+            System.out.println("Piece does not exist");
+            return false;
+        }
+        int row=pos.get("A-"+piece)/10,col=pos.get("A-"+piece)%10;
+        System.out.println("Current pos: "+row+":"+col);
+
+        return true;
+    }
+
+    private static boolean secondMove(){
+
+        return true;
+    }
+
+    private static boolean pMove(String piece,char move){
+        switch (move){
+            case 'F':
+                
+        }
     }
 
     private static boolean getNames(){
-        Scanner sc=new Scanner(System.in);
         System.out.println("For player one, enter names seperated by space:");
         StringBuffer inp=new StringBuffer(sc.nextLine());
         List<String> temp=new ArrayList<>();
         //System.out.println(inp.toString());
-        int j=0,i=0;
+        int j=0,i=0,pTrue=0;
         String a="";
         for(i=0;i<inp.length();i=j+2){
             j=i+1;
@@ -38,6 +90,7 @@ public class Main {
             for(;j<inp.length();j++)
                 if (inp.charAt(j)==',') break inner;
             a=inp.substring(i,j);
+            if (a.charAt(0)=='P') pTrue+=1;
             //System.out.println(a);
             if (!temp.contains(a)) temp.add(a);
             else{
@@ -45,7 +98,10 @@ public class Main {
                 return false;
             }
         }
-        for(i=0;i<temp.size();i++) firstName.add("A-"+temp.get(i));
+        for(i=0;i<temp.size();i++){
+            firstName.add("A-"+temp.get(i));
+            pos.put(firstName.get(i),0*10+i);
+        }
         temp.clear();
         System.out.println("For player two, enter names seperated by space:");
         inp=new StringBuffer(sc.nextLine());
@@ -62,8 +118,19 @@ public class Main {
                 return false;
             }
         }
-        for(i=0;i<temp.size();i++) secondName.add("B-"+temp.get(i));
+        for(i=0;i<temp.size();i++){
+            secondName.add("B-"+temp.get(i));
+            pos.put(secondName.get(i),4*10+i);
+        }
+        if (pTrue>0) initP();
         return true;
+    }
+
+    private static void initP(){
+        pMoves.add('F');
+        pMoves.add('L');
+        pMoves.add('B');
+        pMoves.add('R');
     }
 
     private static void names(){
